@@ -1,1 +1,2 @@
-gcc -o main main.c -I/opt/homebrew/include -L/opt/homebrew/lib -lsndfile `sdl2-config --cflags --libs`
+gcc -o mp_trie mp_trie.c -I/opt/homebrew/include -L/opt/homebrew/lib -lsndfile `sdl2-config --cflags --libs`
+gcc -o mp_bst mp_bst.c -I/opt/homebrew/include -L/opt/homebrew/lib -lsndfile `sdl2-config --cflags --libs`
