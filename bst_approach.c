@@ -197,7 +197,7 @@ void showArtistSongs(struct node *root, char artistName[])
     }
 }
 
-void playSong(struct node root, char songName[], char songPath)
+void playSong(struct node *root, char songName[], char *songPath)
 {
     // char *songPath[1000];
     if (root != NULL)
