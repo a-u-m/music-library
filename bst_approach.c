@@ -145,6 +145,29 @@ struct node *insertNode(struct node *root, char songName[], char artistName[], c
     return root;
 }
 
+struct node *insertNodeSong(struct node *root, char songName[], char artistName[], char genreName[], char path[])
+{
+    if (root == NULL)
+    {
+        root = createNode(songName, artistName, genreName, path);
+        return root;
+    }
+    int result = strcmp(songName, root->songName);
+    // printf("\n");
+    // printf("%d\n", result);
+    // printf("artistName: %s  and  root->artistName: %s   and  result: %d\n", artistName, root->artistName, result);
+    // printf("%s and %s result is %d: \n", name, root->name, result);
+    if (result <= 0)
+    {
+        root->left = insertNode(root->left, songName, artistName, genreName, path);
+    }
+    else
+    {
+        root->right = insertNode(root->right, songName, artistName, genreName, path);
+    }
+    return root;
+}
+
 struct node *search(struct node *root, char artistName[])
 {
     if (root == NULL)
@@ -163,6 +186,27 @@ struct node *search(struct node *root, char artistName[])
     else
     {
         return search(root->right, artistName);
+    }
+}
+
+struct node *searchSong(struct node *root, char songName[])
+{
+    if (root == NULL)
+    {
+        return NULL;
+    }
+    int result = strcmp(songName, root->songName);
+    if (result == 0)
+    {
+        return root;
+    }
+    else if (result < 0)
+    {
+        return search(root->left, songName);
+    }
+    else
+    {
+        return search(root->right, songName);
     }
 }
 
