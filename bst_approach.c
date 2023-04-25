@@ -241,6 +241,23 @@ void showArtistSongs(struct node *root, char artistName[])
     }
 }
 
+void showGenreSongs(struct node *root, char genreName[])
+{
+    if (root != NULL)
+    {
+        showGenreSongs(root->left, genreName);
+        int result = strcmp(genreName, root->genreName);
+        if (result == 0)
+        {
+            printf("%s ", root->songName);
+            printf("%s ", root->artistName);
+            printf("%s ", root->genreName);
+            printf("\n");
+        }
+        showGenreSongs(root->right, genreName);
+    }
+}
+
 void playSong(struct node *root, char songName[], char *songPath)
 {
     // char *songPath[1000];
