@@ -8,6 +8,9 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
+// Music Player DSA CP
+//  ................
+
 void playsong(const char* filename) {
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
 
@@ -560,5 +563,5 @@ int main()
         playSong(rootArtist, songToPlay, songPath);
         printf("\n Song Path = %s", songPath);
     }
-    
+
 }
