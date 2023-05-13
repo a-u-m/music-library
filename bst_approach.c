@@ -107,6 +107,7 @@ struct node
     char path[1000];
     struct node *left;
     struct node *right;
+    int height;
 };
 
 struct node *createNode(char songName[], char artistName[], char genreName[], char path[])
@@ -119,31 +120,110 @@ struct node *createNode(char songName[], char artistName[], char genreName[], ch
     strcpy(n->path, path);
     n->left = NULL;
     n->right = NULL;
+    n->height = 1;
     return n;
 }
 
-struct node *insertNode(struct node *root, char songName[], char artistName[], char genreName[], char path[])
+
+int max(int a, int b){
+    if(a >= b){
+        return a;
+    }
+    else{
+        return b;
+    }
+}
+
+int getHeight(struct node *n){
+    if(n == NULL){
+        return 0;
+    }
+    return n->height;
+}
+
+int getBalanceFactor(struct node *n){
+    if(n == NULL){
+        return 0;
+    }
+    return getHeight(n->left) - getHeight(n->right);
+}
+
+struct node *rightRotate(struct node *y){
+    struct node *x = y->left;
+    struct node *T2 = x->right;
+
+    x->right = y;
+    y->left = T2;
+
+    y->height = max(getHeight(y->right), getHeight(y->left)) + 1;
+    x->height = max(getHeight(x->right), getHeight(x->left)) + 1;
+
+    return x;
+}
+
+struct node *leftRotate(struct node *x) {
+    struct node *y = x->right;
+    struct node *T2 = y->left;
+
+    y->left = x;
+    x->right = T2;
+
+    x->height = max(getHeight(x->left), getHeight(x->right)) + 1;
+    y->height = max(getHeight(y->left), getHeight(y->right)) + 1;
+
+    return y;
+}
+
+struct node *insertNodeArtist(struct node *root, char songName[], char artistName[], char genreName[], char path[])
 {
     if (root == NULL)
     {
         root = createNode(songName, artistName, genreName, path);
         return root;
     }
+
     int result = strcmp(artistName, root->artistName);
-    // printf("\n");
-    // printf("%d\n", result);
-    // printf("artistName: %s  and  root->artistName: %s   and  result: %d\n", artistName, root->artistName, result);
-    // printf("%s and %s result is %d: \n", name, root->name, result);
     if (result <= 0)
     {
-        root->left = insertNode(root->left, songName, artistName, genreName, path);
+        root->left = insertNodeArtist(root->left, songName, artistName, genreName, path);
     }
     else
     {
-        root->right = insertNode(root->right, songName, artistName, genreName, path);
+        root->right = insertNodeArtist(root->right, songName, artistName, genreName, path);
     }
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+    int bf = getBalanceFactor(root);
+
+    int result1 = (root->left != NULL) ? strcmp(artistName, root->left->artistName) : -1;
+    int result2 = (root->right != NULL) ? strcmp(artistName, root->right->artistName) : 1;
+
+    // Left Left Case
+    if (bf > 1 && result1 < 0)
+    {
+        return rightRotate(root);
+    }
+    // Right Right Case
+    if (bf < -1 && result2 > 0)
+    {
+        return leftRotate(root);
+    }
+    // Left Right Case
+    if (bf > 1 && result1 > 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    // Right Left Case
+    if (bf < -1 && result2 < 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
     return root;
 }
+
 
 struct node *insertNodeSong(struct node *root, char songName[], char artistName[], char genreName[], char path[])
 {
@@ -153,18 +233,93 @@ struct node *insertNodeSong(struct node *root, char songName[], char artistName[
         return root;
     }
     int result = strcmp(songName, root->songName);
-    // printf("\n");
-    // printf("%d\n", result);
-    // printf("artistName: %s  and  root->artistName: %s   and  result: %d\n", artistName, root->artistName, result);
-    // printf("%s and %s result is %d: \n", name, root->name, result);
     if (result <= 0)
     {
-        root->left = insertNode(root->left, songName, artistName, genreName, path);
+        root->left = insertNodeSong(root->left, songName, artistName, genreName, path);
     }
     else
     {
-        root->right = insertNode(root->right, songName, artistName, genreName, path);
+        root->right = insertNodeSong(root->right, songName, artistName, genreName, path);
     }
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+    int bf = getBalanceFactor(root);
+
+    int result1 = (root->left != NULL) ? strcmp(songName, root->left->songName) : -1;
+    int result2 = (root->right != NULL) ? strcmp(songName, root->right->songName) : 1;
+
+    // Left Left Case
+    if (bf > 1 && result1 < 0)
+    {
+        return rightRotate(root);
+    }
+    // Right Right Case
+    if (bf < -1 && result2 > 0)
+    {
+        return leftRotate(root);
+    }
+    // Left Right Case
+    if (bf > 1 && result1 > 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    // Right Left Case
+    if (bf < -1 && result2 < 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
+    return root;
+}
+
+struct node *insertNodeGenre(struct node *root, char songName[], char artistName[], char genreName[], char path[])
+{
+    if (root == NULL)
+    {
+        root = createNode(songName, artistName, genreName, path);
+        return root;
+    }
+    int result = strcmp(genreName, root->genreName);
+    if (result <= 0)
+    {
+        root->left = insertNodeSong(root->left, songName, artistName, genreName, path);
+    }
+    else
+    {
+        root->right = insertNodeSong(root->right, songName, artistName, genreName, path);
+    }
+
+    root->height = 1 + max(getHeight(root->left), getHeight(root->right));
+    int bf = getBalanceFactor(root);
+
+    int result1 = (root->left != NULL) ? strcmp(genreName, root->left->genreName) : -1;
+    int result2 = (root->right != NULL) ? strcmp(genreName, root->right->genreName) : 1;
+
+    // Left Left Case
+    if (bf > 1 && result1 < 0)
+    {
+        return rightRotate(root);
+    }
+    // Right Right Case
+    if (bf < -1 && result2 > 0)
+    {
+        return leftRotate(root);
+    }
+    // Left Right Case
+    if (bf > 1 && result1 > 0)
+    {
+        root->left = leftRotate(root->left);
+        return rightRotate(root);
+    }
+    // Right Left Case
+    if (bf < -1 && result2 < 0)
+    {
+        root->right = rightRotate(root->right);
+        return leftRotate(root);
+    }
+
     return root;
 }
 
@@ -210,20 +365,6 @@ struct node *searchSong(struct node *root, char songName[])
     }
 }
 
-void inorder(struct node *root)
-{
-    if (root != NULL)
-    {
-        inorder(root->left);
-        printf("%s ", root->songName);
-        printf("%s ", root->artistName);
-        printf("%s ", root->genreName);
-        printf("%s ", root->path);
-        printf("\n");
-        inorder(root->right);
-    }
-}
-
 void showArtistSongs(struct node *root, char artistName[])
 {
     if (root != NULL)
@@ -258,29 +399,52 @@ void showGenreSongs(struct node *root, char genreName[])
     }
 }
 
-void playSong(struct node *root, char songName[], char *songPath)
+void playSong(struct node *root, char songName[], char* songPath)
 {
-    // char *songPath[1000];
     if (root != NULL)
     {
         playSong(root->left, songName, songPath);
         int result = strcmp(songName, root->songName);
-        // printf("\nStringOne = %s and StringTwo = %s and result = %d\n", songName, root->songName, result);
-        // printf("\n%d ", result);
         if (result == 0)
         {
+            printf("Function %s \n", root->songName);
+            printf("\n");
             strcpy(songPath, root->path);
             return;
         }
         playSong(root->right, songName, songPath);
     }
-    // return "songPath";
+}
+
+void inorderSong(struct node *root){
+    if(root != NULL){
+        inorderSong(root->left);
+        printf("%s ", root->songName);
+        inorderSong(root->right);
+    }
+}
+
+void inorderArtist(struct node *root){
+    if(root != NULL){
+        inorderArtist(root->left);
+        printf("%s ", root->artistName);
+        inorderArtist(root->right);
+    }
+}
+void inorderGenre(struct node *root){
+    if(root != NULL){
+        inorderGenre(root->left);
+        printf("%s ", root->genreName);
+        inorderGenre(root->right);
+    }
 }
 
 int main()
 {
-    struct node *root;
-    root = NULL;
+    struct node *rootSong = NULL;
+    struct node *rootArtist = NULL;
+    struct node *rootGenre = NULL;
+
     char* audio_dir = "./audio/";
     DIR *d;
     struct dirent *dir;
@@ -314,28 +478,87 @@ int main()
             // printf("Album: %s\n", ablum);
             // printf("Genre: %s\n\n", genre);
 
-            root = insertNode(root, dir->d_name, artist, genre, audio_filepath);
-        
+            rootSong = insertNodeSong(rootSong, dir->d_name, artist, genre, audio_filepath);
+            rootArtist = insertNodeArtist(rootArtist, dir->d_name, artist, genre, audio_filepath);
+            rootGenre = insertNodeGenre(rootGenre, dir->d_name, artist, genre, audio_filepath);
 
             sf_close(snd_audiofile);
         }
         closedir(d);
     }
-    // // root = insertNode(root, "Jeet", "Ritviz", "Electronic", "path");
-    // root = insertNode(root, "Kesariya", "Arijit Singh", "Romantic", "Kesariyapath");
-    // root = insertNode(root, "Khali Salam Dua", "Himensh rashamiya", "Romantic", "path");
-    // root = insertNode(root, "Tere Liye", "Atif Aslam", "Romantic", "path");
-    // // root = insertNode(root, "Baaraat", "Ritviz", "Electronic", "path");
-    // root = insertNode(root, "Tere Pyar Mein", "Arijit Singh", "Romantic", "path");
 
-    inorder(root);
+
+    printf("***** Artist Tree *****\n");
+    inorderArtist(rootArtist);
+    printf("\n");
+
+    printf("***** Genre Tree *****\n");
+    inorderGenre(rootGenre);
+    printf("\n");
+
+    printf("***** Song Tree *****\n");
+    inorderSong(rootSong);
+    printf("\n");
 
     printf("\n");
-    char songToPlay[1000];
-    printf("Enter the song to be played: \n");
-    scanf("%s", songToPlay);
+    printf("\n");
+    printf("\n");
 
-    char songPath[1000];
-    playSong(root, songToPlay, songPath);
-    playsong(songPath);
+
+    printf("Press 1 : to play via song name\nPress 2 : to play via aritst name\nPress 3 : to play via genre name\n");
+    int choice;
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+    printf("\n");
+    if(choice == 1){
+        printf("\n");
+        char songToPlay[1000];
+        printf("Enter the song to be played: \n");
+        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+        printf("%s\n", songToPlay);
+
+        char songPath[1000];
+        playSong(rootArtist, songToPlay, songPath);
+        printf("\n Song Path = %s", songPath);
+    }
+    else if (choice == 2) {
+        char artistName[1000];
+        printf("Enter artist name: \n");
+        scanf(" %[^\n]%*c", artistName);  // Remove the & operator before artistName
+        printf("%s \n", artistName);
+        printf("\n");
+        showArtistSongs(rootArtist, artistName);
+
+        printf("\n");
+        char songToPlay[1000];
+        printf("Enter the song to be played: \n");
+        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+        printf("%s\n", songToPlay);
+
+        char songPath[1000];
+        playSong(rootArtist, songToPlay, songPath);
+        printf("\n Song Path = %s", songPath);
+    }
+    else if(choice == 3){
+        char genreName[1000];
+        printf("Enter genre name: \n");
+        scanf(" %[^\n]%*c", genreName);  // Remove the & operator before artistName
+        printf("%s \n", genreName);
+        printf("\n");
+        showGenreSongs(rootArtist, genreName);
+
+        printf("\n");
+        char songToPlay[1000];
+        printf("Enter the song to be played: \n");
+        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+        printf("%s\n", songToPlay);
+
+        char songPath[1000];
+        playSong(rootArtist, songToPlay, songPath);
+        printf("\n Song Path = %s", songPath);
+    }
+    
 }
