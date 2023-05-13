@@ -490,78 +490,82 @@ int main()
         closedir(d);
     }
 
-
-    printf("***** Artist Tree *****\n");
-    inorderArtist(rootArtist);
-    printf("\n");
-
-    printf("***** Genre Tree *****\n");
-    inorderGenre(rootGenre);
-    printf("\n");
-
-    printf("***** Song Tree *****\n");
-    inorderSong(rootSong);
-    printf("\n");
-
-    printf("\n");
-    printf("\n");
-    printf("\n");
-
-
-    printf("Press 1 : to play via song name\nPress 2 : to play via aritst name\nPress 3 : to play via genre name\n");
-    int choice;
-    printf("Enter your choice: ");
-    scanf("%d", &choice);
-    printf("\n");
-    if(choice == 1){
+    while(1){
+        printf("***** Artist Tree *****\n");
+        inorderArtist(rootArtist);
         printf("\n");
-        char songToPlay[1000];
-        printf("Enter the song to be played: \n");
-        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
 
-        printf("%s\n", songToPlay);
+        printf("***** Genre Tree *****\n");
+        inorderGenre(rootGenre);
+        printf("\n");
 
-        char songPath[1000];
-        playSong(rootArtist, songToPlay, songPath);
-        printf("\n Song Path = %s", songPath);
+        printf("***** Song Tree *****\n");
+        inorderSong(rootSong);
+        printf("\n");
+
+        printf("\n");
+        printf("\n");
+        printf("\n");
+
+
+        printf("Press 1 : to play via song name\nPress 2 : to play via aritst name\nPress 3 : to play via genre name\n");
+        int choice;
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+        printf("\n");
+        if(choice == 1){
+            printf("\n");
+            char songToPlay[1000];
+            printf("Enter the song to be played: \n");
+            scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+            printf("%s\n", songToPlay);
+
+            char songPath[1000];
+            playSong(rootArtist, songToPlay, songPath);
+            playsong(songPath);
+            printf("\n Song Path = %s", songPath);
+        }
+        else if (choice == 2) {
+            char artistName[1000];
+            printf("Enter artist name: \n");
+            scanf(" %[^\n]%*c", artistName);  // Remove the & operator before artistName
+            printf("%s \n", artistName);
+            printf("\n");
+            showArtistSongs(rootArtist, artistName);
+
+            printf("\n");
+            char songToPlay[1000];
+            printf("Enter the song to be played: \n");
+            scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+            printf("%s\n", songToPlay);
+
+            char songPath[1000];
+            playSong(rootArtist, songToPlay, songPath);
+            playsong(songPath);
+            printf("\n Song Path = %s", songPath);
+        }
+        else if(choice == 3){
+            char genreName[1000];
+            printf("Enter genre name: \n");
+            scanf(" %[^\n]%*c", genreName);  // Remove the & operator before artistName
+            printf("%s \n", genreName);
+            printf("\n");
+            showGenreSongs(rootArtist, genreName);
+
+            printf("\n");
+            char songToPlay[1000];
+            printf("Enter the song to be played: \n");
+            scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
+
+            printf("%s\n", songToPlay);
+
+            char songPath[1000];
+            playSong(rootArtist, songToPlay, songPath);
+            playsong(songPath);
+            printf("\n Song Path = %s", songPath);
+        }
+
     }
-    else if (choice == 2) {
-        char artistName[1000];
-        printf("Enter artist name: \n");
-        scanf(" %[^\n]%*c", artistName);  // Remove the & operator before artistName
-        printf("%s \n", artistName);
-        printf("\n");
-        showArtistSongs(rootArtist, artistName);
-
-        printf("\n");
-        char songToPlay[1000];
-        printf("Enter the song to be played: \n");
-        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
-
-        printf("%s\n", songToPlay);
-
-        char songPath[1000];
-        playSong(rootArtist, songToPlay, songPath);
-        printf("\n Song Path = %s", songPath);
-    }
-    else if(choice == 3){
-        char genreName[1000];
-        printf("Enter genre name: \n");
-        scanf(" %[^\n]%*c", genreName);  // Remove the & operator before artistName
-        printf("%s \n", genreName);
-        printf("\n");
-        showGenreSongs(rootArtist, genreName);
-
-        printf("\n");
-        char songToPlay[1000];
-        printf("Enter the song to be played: \n");
-        scanf(" %[^\n]%*c", songToPlay);  // Remove the & operator before songToPlay
-
-        printf("%s\n", songToPlay);
-
-        char songPath[1000];
-        playSong(rootArtist, songToPlay, songPath);
-        printf("\n Song Path = %s", songPath);
-    }
-
 }
