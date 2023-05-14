@@ -553,7 +553,9 @@ void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
             continue;
         }
         struct node* temp = searchSong(songroot,values[1]);
-        p[i] = insertPlaylistNode(p[i],values[0],values[1],temp->artistName,temp->genreName,temp->path);
+        if(temp != NULL){
+            p[i] = insertPlaylistNode(p[i],values[0],values[1],temp->artistName,temp->genreName,temp->path);
+        }
     }
 
     fclose(file);
