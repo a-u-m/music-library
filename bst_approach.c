@@ -11,205 +11,7 @@
 // Music Player DSA CP
 //  ................
 
-void displaysong(char* song){
-    int strl = 39-strlen(song);
-    printf("|   %s",song);
-    while(strl--){
-        printf(" ");
-    }
-    printf("|    |\n");
-}
-
-void displayartist(char* artist){
-    int strl = 29-strlen(artist);
-    printf("|    |   %s",artist);
-    while(strl--){
-        printf(" ");
-    }
-    printf("|  ");
-}
-
-void displayGenre(char* genre){
-    int strl = 36-strlen(genre);
-    printf("   %s",genre);
-    while(strl--){
-        printf(" ");
-    }
-    printf("");
-}
-
-void displayCurrentSong(char* cs){
-    int strl = 75-strlen(cs);
-    printf("|    |   %s",cs);
-    while(strl--){
-        printf(" ");
-    }
-    printf("|    |\n");
-}
-
-void displayMainTitle(char mainTitle[100]){
-    int strl = 38-strlen(mainTitle);
-    printf("+-- %s ",mainTitle);
-    while(strl--){
-        printf("-");
-    }
-    printf("+    |\n");
-}
-
-void displayer(char songList[100][100],char artistList[100][100],char genreList[100][100],char currentsong[100],char mainType[100]){
-    system("clear");
-    printf("\n+------------------------------------- MUSIC PLAYER -------------------------------------+\n");
-    printf("|                                                                                        |\n");
-    printf("|    +-- Options ---------------------+  ");
-    displayMainTitle(mainType);
-    printf("|    |                                |  |                                          |    |\n");
-    printf("|    |   1  Play [Songname]           |  ");
-    displaysong(songList[0]);
-    printf("|    |   2  Artist                    |  ");
-    displaysong(songList[1]);
-    printf("|    |   3  Genre                     |  ");
-    displaysong(songList[2]);
-    printf("|    |   4  Show Playlists            |  ");
-    displaysong(songList[3]);
-    printf("|    |   5  Create Playlists          |  ");
-    displaysong(songList[4]);
-    printf("|    |   6  Top Recommendations       |  ");
-    displaysong(songList[5]);
-    printf("|    |                                |  ");
-    displaysong(songList[6]);
-    printf("|    +-- Artists ---------------------+  ");
-    displaysong(songList[7]);
-    printf("|    |                                |  ");
-    displaysong(songList[8]);
-    displayartist(artistList[0]);
-    displaysong(songList[9]);
-    displayartist(artistList[1]);
-    displaysong(songList[10]);
-    displayartist(artistList[2]);
-    displaysong(songList[11]);
-    displayartist(artistList[3]);
-    displaysong(songList[12]);
-    displayartist(artistList[4]);
-    displaysong(songList[13]);
-    printf("|    |                                |  |                                          |    |\n");
-    printf("|    +--------------------------------+  +------------------------------------------+    |\n");
-    //printf("|                                                                                        |\n");
-    printf("|    +-- Genre ---------------------------------------------------------------------+    |\n");
-    printf("|    |                                                                              |    |\n");
-    printf("|    |");
-    displayGenre(genreList[0]);
-    displayGenre(genreList[1]);
-    printf("|    |\n");
-    printf("|    |");
-    displayGenre(genreList[2]);
-    displayGenre(genreList[3]);
-    printf("|    |\n");
-    printf("|    |                                                                              |    |\n");
-    printf("|    +------------------------------------------------------------------------------+    |\n");
-    printf("|                                                                                        |\n");
-    printf("|    +-- Currently Playing ---------------------------------------------------------+    |\n");
-    printf("|    |                                                                              |    |\n");
-    displayCurrentSong(currentsong);
-    printf("|    |                                                                              |    |\n");
-    printf("|    +------------------------------------------------------------------------------+    |\n");
-    printf("|                                                                                        |\n");
-    printf("+----------------------------------------------------------------------------------------+\n");
-
-}
-
-// Playlist
-
-struct playlist{
-    char playlistName[100];
-    char songName[100];
-    char artistName[100];
-    char genreName[100];
-    char path[100];
-    struct playlist* prev;
-    struct playlist* next;
-};
-
-struct playlist* insertPlaylistNode(struct playlist* head, const char* playlistName, const char* songName, const char* artistName, const char* genreName, const char* path) {
-    struct playlist* newNode = (struct playlist*)malloc(sizeof(struct playlist));
-    if (newNode == NULL) {
-        printf("Memory allocation failed.");
-        return NULL;
-    }
-
-    strcpy(newNode->playlistName, playlistName);
-    strcpy(newNode->songName, songName);
-    strcpy(newNode->artistName, artistName);
-    strcpy(newNode->genreName, genreName);
-    strcpy(newNode->path, path);
-
-    newNode->prev = NULL;
-    newNode->next = NULL;
-
-    if (head == NULL) {
-        head = newNode;
-    } 
-    else {
-        struct playlist* current = head;
-        while (current->next != NULL) {
-            current = current->next;
-        }
-        current->next = newNode;
-        newNode->prev = current;
-    }
-    return head;
-}
-
-void addPlaylistToCSV(struct playlist* playlist, FILE* file) {
-    fprintf(file, "%s,%s,%s,%s,%s\n", playlist->playlistName, playlist->songName, playlist->artistName, playlist->genreName, playlist->path);
-}
-
-struct playlist* searchPlaylist(struct playlist** playlists, char givenPlaylist[100]){
-    int i = 0;
-    while(i < 100 && playlists[i] != NULL){
-        if(!strcmp(playlists[i]->playlistName,givenPlaylist))return playlists[i];
-        i++;
-    }
-    return NULL;
-}
-
-void playlistSongs(struct playlist* p, char playlistSongs[100][100]){
-    int i = 0;
-    while(p != NULL){
-        strcpy(playlistSongs[i++],p->songName);
-        p = p->next;
-    }
-}
-
-void initiatePlaylists(struct playlist* p[100]) {
-    int i = 0,j = 0;
-    FILE* file = fopen("playlist.csv", "r");
-    if (file == NULL) {
-        printf("Failed to open the CSV file.\n");
-        return;
-    }
-
-    char line[100];
-    while (fgets(line, 100, file) != NULL) {
-        char* token = strtok(line, ",");
-        char values[6][100];
-        while (token != NULL) {
-            //printf("%s\n", token);
-            strcpy(values[j++],token);
-            token = strtok(NULL, ",");
-        }
-        j=0;
-        if(!strcmp(values[0],"END")){
-            i++;
-            continue;
-        }
-        p[i] = insertPlaylistNode(p[i],values[0],values[1],values[2],values[3],values[4]);
-    }
-
-    fclose(file);
-}
-
-// --------
-
+// BST
 
 void playsong(const char* filename) {
     SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
@@ -648,6 +450,209 @@ void inorderGenre(struct node *root, char genreList[100][100]){
     }
 }
 
+//
+
+void displaysong(char* song){
+    int strl = 39-strlen(song);
+    printf("|   %s",song);
+    while(strl--){
+        printf(" ");
+    }
+    printf("|    |\n");
+}
+
+void displayartist(char* artist){
+    int strl = 29-strlen(artist);
+    printf("|    |   %s",artist);
+    while(strl--){
+        printf(" ");
+    }
+    printf("|  ");
+}
+
+void displayGenre(char* genre){
+    int strl = 36-strlen(genre);
+    printf("   %s",genre);
+    while(strl--){
+        printf(" ");
+    }
+    printf("");
+}
+
+void displayCurrentSong(char* cs){
+    int strl = 75-strlen(cs);
+    printf("|    |   %s",cs);
+    while(strl--){
+        printf(" ");
+    }
+    printf("|    |\n");
+}
+
+void displayMainTitle(char mainTitle[100]){
+    int strl = 38-strlen(mainTitle);
+    printf("+-- %s ",mainTitle);
+    while(strl--){
+        printf("-");
+    }
+    printf("+    |\n");
+}
+
+void displayer(char songList[100][100],char artistList[100][100],char genreList[100][100],char currentsong[100],char mainType[100]){
+    system("clear");
+    printf("\n+------------------------------------- MUSIC PLAYER -------------------------------------+\n");
+    printf("|                                                                                        |\n");
+    printf("|    +-- Options ---------------------+  ");
+    displayMainTitle(mainType);
+    printf("|    |                                |  |                                          |    |\n");
+    printf("|    |   1  Play [Songname]           |  ");
+    displaysong(songList[0]);
+    printf("|    |   2  Artist                    |  ");
+    displaysong(songList[1]);
+    printf("|    |   3  Genre                     |  ");
+    displaysong(songList[2]);
+    printf("|    |   4  Show Playlists            |  ");
+    displaysong(songList[3]);
+    printf("|    |   5  Create Playlists          |  ");
+    displaysong(songList[4]);
+    printf("|    |   6  Top Recommendations       |  ");
+    displaysong(songList[5]);
+    printf("|    |                                |  ");
+    displaysong(songList[6]);
+    printf("|    +-- Artists ---------------------+  ");
+    displaysong(songList[7]);
+    printf("|    |                                |  ");
+    displaysong(songList[8]);
+    displayartist(artistList[0]);
+    displaysong(songList[9]);
+    displayartist(artistList[1]);
+    displaysong(songList[10]);
+    displayartist(artistList[2]);
+    displaysong(songList[11]);
+    displayartist(artistList[3]);
+    displaysong(songList[12]);
+    displayartist(artistList[4]);
+    displaysong(songList[13]);
+    printf("|    |                                |  |                                          |    |\n");
+    printf("|    +--------------------------------+  +------------------------------------------+    |\n");
+    //printf("|                                                                                        |\n");
+    printf("|    +-- Genre ---------------------------------------------------------------------+    |\n");
+    printf("|    |                                                                              |    |\n");
+    printf("|    |");
+    displayGenre(genreList[0]);
+    displayGenre(genreList[1]);
+    printf("|    |\n");
+    printf("|    |");
+    displayGenre(genreList[2]);
+    displayGenre(genreList[3]);
+    printf("|    |\n");
+    printf("|    |                                                                              |    |\n");
+    printf("|    +------------------------------------------------------------------------------+    |\n");
+    printf("|                                                                                        |\n");
+    printf("|    +-- Currently Playing ---------------------------------------------------------+    |\n");
+    printf("|    |                                                                              |    |\n");
+    displayCurrentSong(currentsong);
+    printf("|    |                                                                              |    |\n");
+    printf("|    +------------------------------------------------------------------------------+    |\n");
+    printf("|                                                                                        |\n");
+    printf("+----------------------------------------------------------------------------------------+\n");
+
+}
+
+// Playlist
+
+struct playlist{
+    char playlistName[100];
+    char songName[100];
+    char artistName[100];
+    char genreName[100];
+    char path[100];
+    struct playlist* prev;
+    struct playlist* next;
+};
+
+struct playlist* insertPlaylistNode(struct playlist* head, const char* playlistName, const char* songName, const char* artistName, const char* genreName, const char* path) {
+    struct playlist* newNode = (struct playlist*)malloc(sizeof(struct playlist));
+    if (newNode == NULL) {
+        printf("Memory allocation failed.");
+        return NULL;
+    }
+
+    strcpy(newNode->playlistName, playlistName);
+    strcpy(newNode->songName, songName);
+    strcpy(newNode->artistName, artistName);
+    strcpy(newNode->genreName, genreName);
+    strcpy(newNode->path, path);
+
+    newNode->prev = NULL;
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        head = newNode;
+    } 
+    else {
+        struct playlist* current = head;
+        while (current->next != NULL) {
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->prev = current;
+    }
+    return head;
+}
+
+void addPlaylistToCSV(struct playlist* playlist, FILE* file) {
+    fprintf(file, "%s,%s\n", playlist->playlistName, playlist->songName);
+}
+
+struct playlist* searchPlaylist(struct playlist** playlists, char givenPlaylist[100]){
+    int i = 0;
+    while(i < 100 && playlists[i] != NULL){
+        if(!strcmp(playlists[i]->playlistName,givenPlaylist))return playlists[i];
+        i++;
+    }
+    return NULL;
+}
+
+void playlistSongs(struct playlist* p, char playlistSongs[100][100]){
+    int i = 0;
+    while(p != NULL){
+        strcpy(playlistSongs[i++],p->songName);
+        p = p->next;
+    }
+}
+
+void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
+    int i = 0,j = 0;
+    FILE* file = fopen("playlist.csv", "r");
+    if (file == NULL) {
+        printf("Failed to open the CSV file.\n");
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, 100, file) != NULL) {
+        char* token = strtok(line, ",");
+        char values[6][100];
+        while (token != NULL) {
+            //printf("%s\n", token);
+            strcpy(values[j++],token);
+            token = strtok(NULL, ",");
+        }
+        j=0;
+        if(!strcmp(values[0],"-")){
+            i++;
+            continue;
+        }
+        struct node* temp = searchSong(songroot,values[1]);
+        p[i] = insertPlaylistNode(p[i],values[0],values[1],temp->artistName,temp->genreName,temp->path);
+    }
+
+    fclose(file);
+}
+
+// --------
+
+
 int main()
 {
     struct node *rootSong = NULL;
@@ -697,7 +702,7 @@ int main()
         closedir(d);
     }
 
-    initiatePlaylists(playlists);
+    initiatePlaylists(playlists,rootSong);
 
     char songToPlay[100] = {""};
 
@@ -881,7 +886,7 @@ int main()
                         addPlaylistToCSV(temp, csvFile);
                         temp = temp->next;
                     }
-                    fprintf(csvFile, "%s,%s,%s,%s,%s\n", "END", "END", "END", "END", "END");
+                    fprintf(csvFile, "%s,%s\n", "-", "-");
                     fclose(csvFile);
                     break;
                 }
