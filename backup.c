@@ -180,6 +180,34 @@ void playlistSongs(struct playlist* p, char playlistSongs[100][100]){
     }
 }
 
+void initiatePlaylists(struct playlist* p[100]) {
+    int i = 0,j = 0;
+    FILE* file = fopen("playlist.csv", "r");
+    if (file == NULL) {
+        printf("Failed to open the CSV file.\n");
+        return;
+    }
+
+    char line[100];
+    while (fgets(line, 100, file) != NULL) {
+        char* token = strtok(line, ",");
+        char values[6][100];
+        while (token != NULL) {
+            //printf("%s\n", token);
+            strcpy(values[j++],token);
+            token = strtok(NULL, ",");
+        }
+        j=0;
+        if(!strcmp(values[0],"END")){
+            i++;
+            continue;
+        }
+        p[i] = insertPlaylistNode(p[i],values[0],values[1],values[2],values[3],values[4]);
+    }
+
+    fclose(file);
+}
+
 // --------
 
 
@@ -669,6 +697,8 @@ int main()
         closedir(d);
     }
 
+    initiatePlaylists(playlists);
+
     char songToPlay[100] = {""};
 
     char songList[100][100];
@@ -836,6 +866,7 @@ int main()
             scanf(" %[^\n]%*c", playlistName);
             
             printf("---- Select Songs For %s ----\n",playlistName);
+
             while(1){
                 printf("Song Name: ");
                 scanf(" %[^\n]%*c", temp);
@@ -845,7 +876,12 @@ int main()
                         printf("Failed to open the CSV file.");
                         return 1;
                     }
-                    addPlaylistToCSV(playlists[i], csvFile);
+                    struct playlist* temp = playlists[i];
+                    while(temp != NULL){    
+                        addPlaylistToCSV(temp, csvFile);
+                        temp = temp->next;
+                    }
+                    fprintf(csvFile, "%s,%s,%s,%s,%s\n", "END", "END", "END", "END", "END");
                     fclose(csvFile);
                     break;
                 }

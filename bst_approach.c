@@ -8,101 +8,10 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
-// DSA COURCE PROJECT
-// USING AVL TREE 
+// Music Player DSA CP
+//  ................
 
-// BST
-
-void playsong(const char* filename) {
-    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
-
-    //SDL_WINDOWPOS_UNDEFINED
-
-    SDL_Window* window = SDL_CreateWindow("music-lib", 0, 0, 300, 70, 0);
-    if (window == NULL) {
-        fprintf(stderr, "Failed to create window: %s\n", SDL_GetError());
-        return;
-    }
-
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-
-    if (SDL_LoadWAV(filename, &wavSpec, &wavBuffer, &wavLength) == NULL) {
-        fprintf(stderr, "Could not load %s: %s\n", filename, SDL_GetError());
-        return;
-    }
-
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-    if (deviceId == 0) {
-        fprintf(stderr, "Failed to open audio: %s\n", SDL_GetError());
-        SDL_FreeWAV(wavBuffer);
-        return;
-    }
-
-    int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-    if (success < 0) {
-        fprintf(stderr, "Failed to queue audio: %s\n", SDL_GetError());
-        SDL_CloseAudioDevice(deviceId);
-        SDL_FreeWAV(wavBuffer);
-        return;
-    }
-
-    SDL_PauseAudioDevice(deviceId, 0);
-
-    int isPlaying = 1;
-    int isPaused = 0;
-    while (isPlaying) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            switch (event.type) {
-                case SDL_QUIT:
-                    isPlaying = 0;
-                    break;
-                case SDL_KEYDOWN:
-                    if (event.key.keysym.sym == SDLK_ESCAPE) {
-                        isPlaying = 0;
-                    } else if (event.key.keysym.sym == SDLK_SPACE) {
-                        if (isPaused) {
-                            SDL_PauseAudioDevice(deviceId, 0);
-                            isPaused = 0;
-                        } else {
-                            SDL_PauseAudioDevice(deviceId, 1);
-                            isPaused = 1;
-                        }
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-        if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE]) {
-            isPlaying = 0;
-        }
-        if (SDL_GetQueuedAudioSize(deviceId) == 0) {
-            isPlaying = 0;
-        }
-        SDL_Delay(100);
-    }
-
-    SDL_CloseAudioDevice(deviceId);
-    SDL_FreeWAV(wavBuffer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-}
-
-int len(char arr[])
-{
-    int res = 0;
-    int i = 0;
-    while (arr[i] != '\0')
-    {
-        res++;
-        i++;
-    }
-    return res;
-}
-
+// bst
 
 struct node
 {
@@ -652,6 +561,96 @@ void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
 
 // --------
 
+
+void playsong(const char* filename) {
+    SDL_Init(SDL_INIT_AUDIO | SDL_INIT_VIDEO);
+
+    //SDL_WINDOWPOS_UNDEFINED
+
+    SDL_Window* window = SDL_CreateWindow("music-lib", 0, 0, 300, 70, 0);
+    if (window == NULL) {
+        fprintf(stderr, "Failed to create window: %s\n", SDL_GetError());
+        return;
+    }
+
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+
+    if (SDL_LoadWAV(filename, &wavSpec, &wavBuffer, &wavLength) == NULL) {
+        fprintf(stderr, "Could not load %s: %s\n", filename, SDL_GetError());
+        return;
+    }
+
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    if (deviceId == 0) {
+        fprintf(stderr, "Failed to open audio: %s\n", SDL_GetError());
+        SDL_FreeWAV(wavBuffer);
+        return;
+    }
+
+    int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
+    if (success < 0) {
+        fprintf(stderr, "Failed to queue audio: %s\n", SDL_GetError());
+        SDL_CloseAudioDevice(deviceId);
+        SDL_FreeWAV(wavBuffer);
+        return;
+    }
+
+    SDL_PauseAudioDevice(deviceId, 0);
+
+    int isPlaying = 1;
+    int isPaused = 0;
+    while (isPlaying) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event)) {
+            switch (event.type) {
+                case SDL_QUIT:
+                    isPlaying = 0;
+                    break;
+                case SDL_KEYDOWN:
+                    if (event.key.keysym.sym == SDLK_ESCAPE) {
+                        isPlaying = 0;
+                    } else if (event.key.keysym.sym == SDLK_SPACE) {
+                        if (isPaused) {
+                            SDL_PauseAudioDevice(deviceId, 0);
+                            isPaused = 0;
+                        } else {
+                            SDL_PauseAudioDevice(deviceId, 1);
+                            isPaused = 1;
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (SDL_GetKeyboardState(NULL)[SDL_SCANCODE_ESCAPE]) {
+            isPlaying = 0;
+        }
+        if (SDL_GetQueuedAudioSize(deviceId) == 0) {
+            isPlaying = 0;
+        }
+        SDL_Delay(100);
+    }
+
+    SDL_CloseAudioDevice(deviceId);
+    SDL_FreeWAV(wavBuffer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+}
+
+int len(char arr[])
+{
+    int res = 0;
+    int i = 0;
+    while (arr[i] != '\0')
+    {
+        res++;
+        i++;
+    }
+    return res;
+}
 
 int main()
 {
