@@ -8,8 +8,8 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 
-// Music Player DSA CP
-//  ................
+// DSA COURCE PROJECT
+// USING AVL TREE 
 
 // BST
 
