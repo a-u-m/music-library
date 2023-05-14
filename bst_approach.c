@@ -560,6 +560,10 @@ void playlistSongs(struct playlist* p, char playlistSongs[100][100]){
     }
 }
 
+#include <ctype.h>
+
+
+
 void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
     int i = 0,j = 0;
     FILE* file = fopen("playlist.csv", "r");
@@ -567,13 +571,13 @@ void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
         printf("Failed to open the CSV file.\n");
         return;
     }
-
+    struct node* temp;
+    char values[2][100] = {""};
     char line[100];
     while (fgets(line, 100, file) != NULL) {
         char* token = strtok(line, ",");
-        char values[6][100];
         while (token != NULL) {
-            //printf("%s\n", token);
+            printf("%s", token);
             strcpy(values[j++],token);
             token = strtok(NULL, ",");
         }
@@ -582,8 +586,10 @@ void initiatePlaylists(struct playlist* p[100],struct node* songroot) {
             i++;
             continue;
         }
-        struct node* temp = searchSong(songroot,values[1]);
+        values[1][strcspn(values[1], "\n")] = '\0';
+        temp = searchSong(songroot,values[1]);
         if(temp != NULL){
+            printf("%s\n",temp->songName);
             p[i] = insertPlaylistNode(p[i],values[0],values[1],temp->artistName,temp->genreName,temp->path);
         }
     }
@@ -918,8 +924,15 @@ int main()
                     playlistSongs(selectedPlaylist, selectedPlaylistSongs);
                     displayer(selectedPlaylistSongs, artistList, genreList, "NO SONG PLAYING!", selectedPlaylist->playlistName);
                     char pause[100];
-                    printf("Write Any Character to Break the Pause: ");
-                    scanf("%s", pause);
+                    struct playlist* dupli = selectedPlaylist;
+                    while(dupli != NULL){
+                        system("clear");
+                        displayer(selectedPlaylistSongs, artistList, genreList, dupli->songName, dupli->playlistName);
+                        playsong(dupli->path);
+                        dupli = dupli->next;
+                    }
+                    // printf("Write Any Character to Break the Pause: ");
+                    // scanf("%s", pause);
                 }
             }
         }
