@@ -462,29 +462,41 @@ void displayer(char songList[100][100],char artistList[100][100],char genreList[
     displaysong(songList[7]);
     printf("|    |                                |  ");
     displaysong(songList[8]);
-    displayartist(artistList[0]);
-    displaysong(songList[9]);
-    displayartist(artistList[1]);
-    displaysong(songList[10]);
-    displayartist(artistList[2]);
-    displaysong(songList[11]);
-    displayartist(artistList[3]);
-    displaysong(songList[12]);
-    displayartist(artistList[4]);
-    displaysong(songList[13]);
+    // displayartist(artistList[0]);
+    // displaysong(songList[9]);
+    // displayartist(artistList[1]);
+    // displaysong(songList[10]);
+    // displayartist(artistList[2]);
+    // displaysong(songList[11]);
+    // displayartist(artistList[3]);
+    // displaysong(songList[12]);
+    // displayartist(artistList[4]);
+    // displaysong(songList[13]);
+    int i = 8,j = 0;
+    while(i < 100 && j < 100 && (strcmp(songList[i]," ") || strcmp(artistList[j]," "))){
+        displayartist(artistList[j++]);
+        displaysong(songList[i++]);
+    }
     printf("|    |                                |  |                                          |    |\n");
     printf("|    +--------------------------------+  +------------------------------------------+    |\n");
     //printf("|                                                                                        |\n");
     printf("|    +-- Genre ---------------------------------------------------------------------+    |\n");
     printf("|    |                                                                              |    |\n");
-    printf("|    |");
-    displayGenre(genreList[0]);
-    displayGenre(genreList[1]);
-    printf("|    |\n");
-    printf("|    |");
-    displayGenre(genreList[2]);
-    displayGenre(genreList[3]);
-    printf("|    |\n");
+    int k = 0;
+    while(k < 100 && strcmp(genreList[k], " ")){
+        printf("|    |");
+        displayGenre(genreList[k++]);
+        displayGenre(genreList[k++]);
+        printf("|    |\n");
+    }
+    // printf("|    |");
+    // displayGenre(genreList[0]);
+    // displayGenre(genreList[1]);
+    // printf("|    |\n");
+    // printf("|    |");
+    // displayGenre(genreList[2]);
+    // displayGenre(genreList[3]);
+    // printf("|    |\n");
     printf("|    |                                                                              |    |\n");
     printf("|    +------------------------------------------------------------------------------+    |\n");
     printf("|                                                                                        |\n");
@@ -739,7 +751,6 @@ void updateFrequency(const char* type, const char* functionName)
     fclose(tempFile);
     remove("frequency.csv");
     rename("temp.csv", "frequency.csv");
-
     printf("Function frequency updated successfully.\n");
 }
 
@@ -801,6 +812,27 @@ void shuffleArray(char arr[100][100], int size) {
     }
 }
 
+void removeDuplicates(char arr[100][100], int size) {
+    int i, j, k;
+
+    for (i = 0; i < size; i++) {
+        if (arr[i][0] == '\0')
+            continue;
+        
+        for (j = i + 1; j < size; j++) {
+            if (arr[j][0] == '\0')
+                continue;
+            
+            if (strcmp(arr[i], arr[j]) == 0) {
+                for (k = j; k < size; k++) {
+                    strcpy(arr[k], arr[k + 1]);
+                }
+                size--;
+                j--;
+            }
+        }
+    }
+}
 
 
 //
@@ -913,8 +945,8 @@ int main()
 
             printf("%s\n", songToPlay);
             char songPath[1000] = {""};
-            playSong(rootArtist, songToPlay, songPath);
-            if (!strcmp(songPath, ""))
+            struct node* selectedSong = searchSong(rootSong, songToPlay);
+            if (selectedSong == NULL)
             {
                 strcpy(songToPlay, "");
                 displayer(songList, artistList, genreList, "NO SONG PLAYING!", "Songs");
@@ -922,9 +954,11 @@ int main()
             }
             else
             {
-                updateFrequency("song",songToPlay);
-                displayer(songList, artistList, genreList, songToPlay, "Songs");
-                playsong(songPath);
+                updateFrequency("song",selectedSong->songName);
+                updateFrequency("artist",selectedSong->artistName);
+                updateFrequency("genre",selectedSong->genreName);
+                displayer(songList, artistList, genreList, selectedSong->songName, "Songs");
+                playsong(selectedSong->path);
                 strcpy(songToPlay, "");
             }
         }
@@ -945,9 +979,9 @@ int main()
             int i = 0;
             showArtistSongs(rootArtist, artistName, &i, givenArtistSongs);
 
-            if(strcmp(givenArtistSongs[0]," ")){
-                updateFrequency("artist",artistName);
-            }
+            // if(strcmp(givenArtistSongs[0]," ")){
+            //     updateFrequency("artist",artistName);
+            // }
 
             system("clear");
             displayer(givenArtistSongs, artistList, genreList, "NO SONG PLAYING!", title);
@@ -958,8 +992,8 @@ int main()
             printf("%s\n", songToPlay);
 
             char songPath[1000] = {""};
-            playSong(rootArtist, songToPlay, songPath);
-            if (!strcmp(songPath, ""))
+            struct node* selectedSong = searchSong(rootSong, songToPlay);
+            if (selectedSong == NULL)
             {
                 strcpy(songToPlay, "");
                 displayer(givenArtistSongs, artistList, genreList, "NO SONG PLAYING!", title);
@@ -967,9 +1001,11 @@ int main()
             }
             else
             {
-                updateFrequency("song",songToPlay);
-                displayer(givenArtistSongs, artistList, genreList, songToPlay, title);
-                playsong(songPath);
+                updateFrequency("song",selectedSong->songName);
+                updateFrequency("artist",selectedSong->artistName);
+                updateFrequency("genre",selectedSong->genreName);
+                displayer(givenArtistSongs, artistList, genreList, selectedSong->songName, title);
+                playsong(selectedSong->path);
                 strcpy(songToPlay, "");
             }
             // printf("\n Song Path = %s", songPath);
@@ -990,9 +1026,9 @@ int main()
             int i = 0;
             showGenreSongs(rootGenre, genreName, &i, givenGenreSongs);
 
-            if(strcmp(givenGenreSongs[0]," ")){
-                updateFrequency("genre",genreName);
-            }
+            // if(strcmp(givenGenreSongs[0]," ")){
+            //     updateFrequency("genre",genreName);
+            // }
 
             system("clear");
             displayer(givenGenreSongs, artistList, genreList, "NO SONG PLAYING!", title);
@@ -1001,8 +1037,8 @@ int main()
             scanf(" %[^\n]%*c", songToPlay); // Remove the & operator before songToPlay
 
             char songPath[1000] = {""};
-            playSong(rootGenre, songToPlay, songPath);
-            if (!strcmp(songPath, ""))
+            struct node* selectedSong = searchSong(rootSong, songToPlay);
+            if (selectedSong == NULL)
             {
                 strcpy(songToPlay, "");
                 displayer(givenGenreSongs, artistList, genreList, "NO SONG PLAYING!", title);
@@ -1010,9 +1046,11 @@ int main()
             }
             else
             {
-                updateFrequency("song",songToPlay);
-                displayer(givenGenreSongs, artistList, genreList, songToPlay, title);
-                playsong(songPath);
+                updateFrequency("song",selectedSong->songName);
+                updateFrequency("artist",selectedSong->artistName);
+                updateFrequency("genre",selectedSong->genreName);
+                displayer(givenGenreSongs, artistList, genreList, selectedSong->songName, title);
+                playsong(selectedSong->path);
                 strcpy(songToPlay, "");
             }
         }
@@ -1145,7 +1183,7 @@ int main()
                 if(strcmp(topArtistSongs[i]," "))strcpy(recommandationArray[counter++],topArtistSongs[i]);
                 else break;
             }
-
+            removeDuplicates(recommandationArray,counter);
             int c2 = 0,t= 2;
             struct playlist* recommendedPlaylist = NULL;
             while(c2 < 100 && strcmp(recommandationArray[c2]," ")){
@@ -1154,6 +1192,7 @@ int main()
                 c2++;
             }
             printf("%p",recommendedPlaylist);
+
 
             system("clear");
             displayer(recommandationArray, artistList, genreList, "NO SONG PLAYING!", "Recommendations");
