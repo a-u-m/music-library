@@ -287,6 +287,29 @@ struct node *searchSong(struct node *root, char songName[])
     }
 }
 
+void playSongPath(struct node *root, char songName[], char *songPath)
+{
+    if (root != NULL)
+    {
+        int result = strcmp(songName, root->songName);
+        if (result == 0)
+        {
+            printf("Function %s \n", root->songName);
+            printf("\n");
+            strcpy(songPath, root->path);
+            return;
+        }
+        else if (result < 0)
+        {
+            playSongPath(root->left, songName, songPath);
+        }
+        else
+        {
+            playSongPath(root->right, songName, songPath);
+        }
+    }
+}
+
 char prevArtistSong[1000] = "";
 void showArtistSongs(struct node *root, char artistName[], int *i, char artistSongs[100][100])
 {
