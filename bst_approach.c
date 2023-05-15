@@ -533,9 +533,9 @@ struct playlist{
     struct playlist* next;
 };
 
-struct node* deleteValueNode(struct node* head, int value) {
-    struct node* current = head;
-    if (current != NULL && current->data == value) {
+struct playlist* deleteValueNode(struct playlist* head, const char* value) {
+    struct playlist* current = head;
+    if (current != NULL && strcmp(current->data, value) == 0) {
         head = current->next;
         if (head != NULL) {
             head->prev = NULL;
@@ -543,7 +543,7 @@ struct node* deleteValueNode(struct node* head, int value) {
         free(current);
         return head;
     }
-    while (current != NULL && current->data != value) {
+    while (current != NULL && strcmp(current->data, value) != 0) {
         current = current->next;
     }
     if (current == NULL) {
@@ -560,6 +560,37 @@ struct node* deleteValueNode(struct node* head, int value) {
     
     return head;
 }
+
+
+
+struct node* insertAtEnd(struct node* head, const char* value) {
+    struct node* newNode = (struct node*)malloc(sizeof(struct node));
+    strcpy(newNode->data, value);
+    newNode->next = NULL;
+
+    if (head == NULL) {
+        newNode->prev = NULL;
+        head = newNode;
+    } else {
+        // Traverse to the last node
+        struct node* current = head;
+        while (current->next != NULL) {
+            int result = strcmp(value, root->songName);
+            if (result == 0)
+            {
+                /* code */
+                printf("Song already available in playlist\n");
+                return head;
+            }
+            current = current->next;
+        }
+        current->next = newNode;
+        newNode->prev = current;
+    }
+
+    return head;
+}
+
 
 
 struct playlist* insertPlaylistNode(struct playlist* head, const char* playlistName, const char* songName, const char* artistName, const char* genreName, const char* path) {
