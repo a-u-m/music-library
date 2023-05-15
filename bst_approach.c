@@ -936,7 +936,8 @@ int main()
 
             printf("%s\n", songToPlay);
             char songPath[1000] = {""};
-            playSong(rootArtist, songToPlay, songPath);
+            // playSong(rootArtist, songToPlay, songPath);
+            playSongPath(rootSong, songToPlay, songPath);
             if (!strcmp(songPath, ""))
             {
                 strcpy(songToPlay, "");
@@ -981,7 +982,8 @@ int main()
             printf("%s\n", songToPlay);
 
             char songPath[1000] = {""};
-            playSong(rootArtist, songToPlay, songPath);
+            // playSong(rootArtist, songToPlay, songPath);
+            playSongPath(rootSong, songToPlay, songPath);
             if (!strcmp(songPath, ""))
             {
                 strcpy(songToPlay, "");
@@ -1024,7 +1026,8 @@ int main()
             scanf(" %[^\n]%*c", songToPlay); // Remove the & operator before songToPlay
 
             char songPath[1000] = {""};
-            playSong(rootGenre, songToPlay, songPath);
+            // playSong(rootGenre, songToPlay, songPath);
+            playSongPath(rootSong, songToPlay, songPath);
             if (!strcmp(songPath, ""))
             {
                 strcpy(songToPlay, "");
