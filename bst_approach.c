@@ -533,6 +533,35 @@ struct playlist{
     struct playlist* next;
 };
 
+struct node* deleteValueNode(struct node* head, int value) {
+    struct node* current = head;
+    if (current != NULL && current->data == value) {
+        head = current->next;
+        if (head != NULL) {
+            head->prev = NULL;
+        }
+        free(current);
+        return head;
+    }
+    while (current != NULL && current->data != value) {
+        current = current->next;
+    }
+    if (current == NULL) {
+        printf("Song not available in playlist\n");
+        return head;
+    }
+    if (current->prev != NULL) {
+        current->prev->next = current->next;
+    }
+    if (current->next != NULL) {
+        current->next->prev = current->prev;
+    }
+    free(current);
+    
+    return head;
+}
+
+
 struct playlist* insertPlaylistNode(struct playlist* head, const char* playlistName, const char* songName, const char* artistName, const char* genreName, const char* path) {
     struct playlist* newNode = (struct playlist*)malloc(sizeof(struct playlist));
     if (newNode == NULL) {
